@@ -1,17 +1,25 @@
 import json
 
 Playing = True
-
+PlayingGame = True
 def main():
     global Playing
-    while Playing:
+    global PlayingGame
+    while PlayingGame:
         menu_Choice = getMenuChoice()
         if menu_Choice == 0:
             Playing = False
+            PlayingGame = False
         elif menu_Choice == 1:
-            playGame()
+            getDefaultGame()
+        elif menu_Choice == 2:
+            loadGame()
+        elif menu_Choice == 3:
+            saveGame()
         elif menu_Choice == 4:
             editNode()
+        elif menu_Choice == 5:
+            playGame()
 
     
 
@@ -28,11 +36,13 @@ def getMenuChoice():
 
 def playGame():
     global Playing
+    global PlayingGame
     playernode = "start"
-    while Playing:
+    while PlayingGame:
         playernode = playNode(playernode)
         if playernode == "quit":
-            Playing = False
+            PlayingGame = False
+            getMenuChoice()
         elif playernode == "start":
             getDefaultGame()
 
@@ -64,6 +74,7 @@ def getDefaultGame():
     return {
         "start":["Default start node","1) start over","start", "2) quit","quit"],
     }
+    
 def editNode():
     print("Create or edit a node")
     print("Current nodes:")
@@ -71,9 +82,9 @@ def editNode():
     game_data = getDefaultGame()
     for node in game_data.keys(): # i figured out the key was the thing on the outside of the dict from a handy yt video
         print(node)
-
+    
     editing_nodes = input("Choose node to edit or enter new node name: ")
-    if editing_nodes in game_data:
+    if editing_nodes in game_data.keys():
         node_details = game_data[editing_nodes]
         Desc = node_details[0]
         MenuA = node_details[1]
@@ -85,17 +96,46 @@ def editNode():
         update_NodeA = input(f"Node A ( Current: {NodeA}) New: ")
         update_MenuB = input(f"MenuB ( Current: {MenuB}) New: ")
         update_NodeB = input(f"NodeB ( Current: {NodeB}) New: ")
-        node_details[0] = update_desc
-        print(node_details)
+        if update_desc == "":
+            node_details[0] = Desc
+        else:
+            node_details[0] = update_desc
+        if update_MenuA == "":
+            node_details[1] = MenuA
+        else:
+            node_details[1] = update_MenuA
+        if update_NodeA == "":
+            node_details[2] = NodeA
+        else:
+            node_details[2] = update_NodeA
+        if update_MenuB == "":
+            node_details[3] = MenuB
+        else:
+            node_details[3] = update_MenuB
+        if update_NodeB == "":
+            node_details[4] = NodeB
+        else:
+            node_details[4] = update_NodeB
+        print(game_data)
+        return game_data
     else:
-        print("No node found")
-
-
-def editField():
-    print()
+        update_desc = input(f"Description (): ")
+        update_MenuA = input(f"Menu A (): ")
+        update_NodeA = input(f"Node A (): ")
+        update_MenuB = input(f"MenuB (): ")
+        update_NodeB = input(f"NodeB (): ")
+        game_data[editing_nodes] = update_desc, update_MenuA, update_NodeA, update_MenuB, update_NodeB 
+        print(game_data)
+        return game_data
+    
 def saveGame():
-    print()
+    outFile = open("savedGame.json", "w")
+    json.dump(editNode(), outFile, indent=2)
+    outFile.close
+    print("Saved game to a json")
 def loadGame():
-    print()
-
+    with open('savedGame.json') as f:
+        modified_data = json.load(f)
+        cur_game = modified_data
+        return cur_game
 main()
